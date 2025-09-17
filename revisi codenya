@@ -91,7 +91,7 @@ def plot_signal(bits_str, signal_type):
 
     # dictionary sinyal
     sig_data = {
-        "Data Biner": build_continuous(bits, digital_bit),
+        "Digital": build_continuous(bits, digital_bit),
         "NRZ-L": build_continuous(bits, nrzl_bit),
         "NRZ-I": nrzi_encode(bits),
         "Manchester": build_continuous(bits, manchester_bit),
@@ -109,7 +109,7 @@ def plot_signal(bits_str, signal_type):
 
     # plotting
     plt.figure(figsize=(12, 4))
-    if signal_type in ["Data Biner", "NRZ-L", "NRZ-I", "Manchester", "Differential Manchester", "RZ (Return-to-Zero)"]:
+    if signal_type in ["Digital", "NRZ-L", "NRZ-I", "Manchester", "Differential Manchester", "RZ (Return-to-Zero)"]:
         plt.plot(time, sig, drawstyle='steps-pre', color='green')
     else:
         plt.plot(time, sig, color='green')
@@ -148,7 +148,7 @@ entry.pack()
 
 tk.Label(root, text="Pilih jenis sinyal:").pack(pady=6)
 combo = ttk.Combobox(root, values=[
-    "Data Biner", "NRZ-L", "NRZ-I", "Manchester", "Differential Manchester",
+    "Digital", "NRZ-L", "NRZ-I", "Manchester", "Differential Manchester",
     "RZ (Return-to-Zero)", "AM (Amplitude Modulation)", "PM (Phase Modulation)",
     "FM (Frequency Modulation)", "ASK (Amplitude Shift Keying)",
     "FSK (Frequency Shift Keying)", "PSK (Phase Shift Keying)"
