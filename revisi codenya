@@ -12,7 +12,7 @@ def am_bit(bit):
     return np.sin(2 * np.pi * t_bit) if bit == "1" else np.zeros(Tb)
 
 def ask_bit(bit):  
-    return np.sin(2 * np.pi * t_bit) if bit == "1" else np.zeros(Tb)
+    return np.sin(8 * np.pi * t_bit) if bit == "1" else np.zeros(Tb)
 
 def pm_bit(bit):   
     phase = 0 if bit == "0" else np.pi
@@ -20,14 +20,16 @@ def pm_bit(bit):
 
 def psk_bit(bit):  
     phase = 0 if bit == "0" else np.pi
-    return np.sin(2 * np.pi * t_bit + phase)
+    return np.sin(8 * np.pi * t_bit + phase)
 
-def fm_bit(bit):   # FM (ubah frekuensi, tapi tetap 1 periode per bit)
-    f = 1 if bit == "0" else 2   # "0" = 1 siklus, "1" = 2 siklus dalam 1 bit
+def fm_bit(bit):   
+    # FM: bit 0 = 4 gelombang, bit 1 = 1 gelombang
+    f = 4 if bit == "0" else 1
     return np.sin(2 * np.pi * f * t_bit)
 
-def fsk_bit(bit):  # FSK (shift frekuensi)
-    f = 1 if bit == "0" else 2
+def fsk_bit(bit):  
+    # FSK: bit 0 = 4 gelombang, bit 1 = 8 gelombang
+    f = 4 if bit == "0" else 8
     return np.sin(2 * np.pi * f * t_bit)
 
 # ====== Line coding ======
