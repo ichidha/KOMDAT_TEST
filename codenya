@@ -1,0 +1,159 @@
+import tkinter as tk
+from tkinter import messagebox, ttk
+import numpy as np
+import matplotlib.pyplot as plt
+
+
+Tb = 300                    
+t_bit = np.linspace(0, 1, Tb, endpoint=False)  
+
+
+def am_bit(bit):   
+    return np.sin(2 * np.pi * t_bit) if bit == "1" else np.zeros(Tb)
+
+def ask_bit(bit):  
+    return np.sin(2 * np.pi * t_bit) if bit == "1" else np.zeros(Tb)
+
+def pm_bit(bit):   
+    phase = 0 if bit == "0" else np.pi
+    return np.sin(2 * np.pi * t_bit + phase)
+
+def psk_bit(bit):  
+    phase = 0 if bit == "0" else np.pi
+    return np.sin(2 * np.pi * t_bit + phase)
+
+def fm_bit(bit):   # FM (ubah frekuensi, tapi tetap 1 periode per bit)
+    f = 1 if bit == "0" else 2   # "0" = 1 siklus, "1" = 2 siklus dalam 1 bit
+    return np.sin(2 * np.pi * f * t_bit)
+
+def fsk_bit(bit):  # FSK (shift frekuensi)
+    f = 1 if bit == "0" else 2
+    return np.sin(2 * np.pi * f * t_bit)
+
+# ====== Line coding ======
+def digital_bit(bit):
+    return np.ones(Tb) if bit == "1" else np.zeros(Tb)
+
+def nrzl_bit(bit):
+    return np.ones(Tb) if bit == "1" else -np.ones(Tb)
+
+def nrzi_encode(bits):
+    level = 1
+    out = []
+    for b in bits:
+        if b == "1":
+            level *= -1
+        out.append(np.ones(Tb) * level)
+    return np.concatenate(out)
+
+def manchester_bit(bit):
+    if bit == "1":
+        return np.concatenate([np.ones(Tb//2), -np.ones(Tb//2)])
+    else:
+        return np.concatenate([-np.ones(Tb//2), np.ones(Tb//2)])
+
+def diff_manchester_encode(bits):
+    prev = 1
+    out = []
+    for b in bits:
+        if b == "0":
+            start = -prev
+        else:
+            start = prev
+        half1 = np.ones(Tb//2) * start
+        half2 = np.ones(Tb//2) * (-start)
+        out.append(np.concatenate([half1, half2]))
+        prev = -start
+    return np.concatenate(out)
+
+def rz_encode(bits):
+    out = []
+    for b in bits:
+        if b == "1":
+            half = np.concatenate([np.ones(Tb//2), np.zeros(Tb//2)])
+        else:
+            half = np.concatenate([-np.ones(Tb//2), np.zeros(Tb//2)])
+        out.append(half)
+    return np.concatenate(out)
+
+#Helper untuk sinyal penuh 
+def build_continuous(bits, per_bit_func):
+    return np.concatenate([per_bit_func(b) for b in bits])
+
+# Plot satu sinyal 
+def plot_signal(bits_str, signal_type):
+    bits = list(bits_str)
+    nbits = len(bits)
+    total_samples = nbits * Tb
+    time = np.linspace(0, nbits, total_samples, endpoint=False)
+
+    # dictionary sinyal
+    sig_data = {
+        "Data Biner": build_continuous(bits, digital_bit),
+        "NRZ-L": build_continuous(bits, nrzl_bit),
+        "NRZ-I": nrzi_encode(bits),
+        "Manchester": build_continuous(bits, manchester_bit),
+        "Differential Manchester": diff_manchester_encode(bits),
+        "RZ (Return-to-Zero)": rz_encode(bits),
+        "AM (Amplitude Modulation)": build_continuous(bits, am_bit),
+        "PM (Phase Modulation)": build_continuous(bits, pm_bit),
+        "FM (Frequency Modulation)": build_continuous(bits, fm_bit),
+        "ASK (Amplitude Shift Keying)": build_continuous(bits, ask_bit),
+        "FSK (Frequency Shift Keying)": build_continuous(bits, fsk_bit),
+        "PSK (Phase Shift Keying)": build_continuous(bits, psk_bit),
+    }
+
+    sig = sig_data[signal_type]
+
+    # plotting
+    plt.figure(figsize=(12, 4))
+    if signal_type in ["Data Biner", "NRZ-L", "NRZ-I", "Manchester", "Differential Manchester", "RZ (Return-to-Zero)"]:
+        plt.plot(time, sig, drawstyle='steps-pre', color='green')
+    else:
+        plt.plot(time, sig, color='green')
+
+    plt.axhline(0, color='black', linewidth=0.7)
+    plt.ylim(-1.5, 1.5)
+    plt.title(signal_type, fontsize=12)
+
+    for k in range(nbits + 1):
+        plt.axvline(k, color='gray', linewidth=0.4, alpha=0.4)
+
+    y_text = -1.25
+    for i, b in enumerate(bits):
+        plt.text(i + 0.5, y_text, b, ha='center', va='center', fontsize=9, color='black')
+
+    plt.xlabel("Time (bit intervals)")
+    plt.show()
+
+# ====== GUI ======
+def on_generate_one():
+    npm = entry.get().strip()
+    if not npm.isdigit():
+        messagebox.showerror("Input error", "Masukkan NPM berupa angka.")
+        return
+    bits_str = bin(int(npm))[2:]
+    signal_type = combo.get()
+    plot_signal(bits_str, signal_type)
+
+root = tk.Tk()
+root.title("Visualisasi 12 Sinyal Digital & Modulasi")
+root.geometry("500x200")
+
+tk.Label(root, text="Masukkan NPM (angka):").pack(pady=6)
+entry = tk.Entry(root, width=30)
+entry.pack()
+
+tk.Label(root, text="Pilih jenis sinyal:").pack(pady=6)
+combo = ttk.Combobox(root, values=[
+    "Data Biner", "NRZ-L", "NRZ-I", "Manchester", "Differential Manchester",
+    "RZ (Return-to-Zero)", "AM (Amplitude Modulation)", "PM (Phase Modulation)",
+    "FM (Frequency Modulation)", "ASK (Amplitude Shift Keying)",
+    "FSK (Frequency Shift Keying)", "PSK (Phase Shift Keying)"
+], state="readonly", width=40)
+combo.pack()
+combo.current(0)
+
+tk.Button(root, text="Generate Sinyal", command=on_generate_one).pack(pady=10)
+
+root.mainloop()
