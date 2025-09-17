@@ -37,7 +37,7 @@ def digital_bit(bit):
     return np.ones(Tb) if bit == "1" else np.zeros(Tb)
 
 def nrzl_bit(bit):
-    return np.ones(Tb) if bit == "1" else -np.ones(Tb)
+    return np.ones(Tb) if bit == "0" else -np.ones(Tb)
 
 def nrzi_encode(bits):
     level = 1
