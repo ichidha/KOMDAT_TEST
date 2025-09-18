@@ -30,16 +30,13 @@ def psk_bit(bit):
     return np.sin(8 * np.pi * t_bit + phase)
 
 def fm_bit(bit):   
-    # FM: bit 0 = 4 gelombang, bit 1 = 1 gelombang
     f = 4 if bit == "0" else 1
     return np.sin(2 * np.pi * f * t_bit)
 
 def fsk_bit(bit):  
-    # FSK: bit 0 = 4 gelombang, bit 1 = 8 gelombang
     f = 4 if bit == "0" else 8
     return np.sin(2 * np.pi * f * t_bit)
 
-# ====== Line coding ======
 def digital_bit(bit):
     return np.ones(Tb) if bit == "1" else np.zeros(Tb)
 
@@ -85,18 +82,15 @@ def rz_encode(bits):
         out.append(half)
     return np.concatenate(out)
 
-#Helper untuk sinyal penuh 
 def build_continuous(bits, per_bit_func):
     return np.concatenate([per_bit_func(b) for b in bits])
 
-# Plot satu sinyal 
 def plot_signal(bits_str, signal_type):
     bits = list(bits_str)
     nbits = len(bits)
     total_samples = nbits * Tb
     time = np.linspace(0, nbits, total_samples, endpoint=False)
 
-    # dictionary sinyal
     sig_data = {
         "Digital": build_continuous(bits, digital_bit),
         "NRZ-L": build_continuous(bits, nrzl_bit),
@@ -114,7 +108,6 @@ def plot_signal(bits_str, signal_type):
 
     sig = sig_data[signal_type]
 
-    # plotting
     plt.figure(figsize=(12, 4))
     if signal_type in ["Digital", "NRZ-L", "NRZ-I", "Manchester", "Differential Manchester", "RZ (Return-to-Zero)"]:
         plt.plot(time, sig, drawstyle='steps-pre', color='green')
@@ -135,7 +128,6 @@ def plot_signal(bits_str, signal_type):
     plt.xlabel("Time (bit intervals)")
     plt.show()
 
-# ====== GUI ======
 def on_generate_one():
     npm = entry.get().strip()
     if not npm.isdigit():
