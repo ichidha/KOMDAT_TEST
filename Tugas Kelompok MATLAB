@@ -1,3 +1,9 @@
+# 2417051005 Naura Azura Grahyta M (Ilmu Komputer A)
+# 2417051067 NUR RAMADHANI (Ilmu Komputer B)
+# 2457051013 FX NOVRYANDHIKA WIDYANTO (Ilmu Komputer B)
+
+
+
 import tkinter as tk
 from tkinter import messagebox, ttk
 import numpy as np
